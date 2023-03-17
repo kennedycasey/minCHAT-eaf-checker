@@ -12,11 +12,17 @@ ui <- fluidPage(
 
     # Sidebar panel for inputs ----
     sidebarPanel(
-
       # Input: Annotation file ----
       fileInput("file1", "Choose your annotation file",
                 accept = c("text/tab-separated-values",
                          ".txt")),
+      
+      # Input: Legal tier names list ----
+      fileInput("tier_names", "Optional: Add your own list of valid tier names", 
+                accept = c(".csv")),
+      
+      # Optional input: Keep exisint AAS tier names? ----
+      checkboxInput("keep_AAS_tier_names", "Keep standard ACLEW tier names?"),
 
       # Submit button:
       actionButton("submit", "Submit")
@@ -35,6 +41,7 @@ ui <- fluidPage(
 server <- function(input, output) {
   report <- eventReactive(input$submit, {
     req(input$file1)
+    assign.legal.tier.names(input$tier_names$datapath, input$tier_names$name, input$keep_AAS_tier_names)
     check.annotations(input$file1$datapath, input$file1$name)
   })
 

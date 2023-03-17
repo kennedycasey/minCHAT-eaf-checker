@@ -3,6 +3,24 @@ library(lubridate)
 library(stringr)
 library(phonfieldwork)
 
+assign.legal.tier.names <- function(tierfile, nametierfile, keep_AAS_tier_names) {
+  aclew.tier.names <- "(^xds@[FMU][ACU](\\d{1}|E)$)|(^xds@EE1$)|(^(vcm|lex|mwu)@CHI$)|(^[FMU][ACU](\\d{1}|E)$)|(^EE1$)|(^CHI$)|(^context$)|(^code_num$)|(^code$)|(^notes$)|(^on_off)"
+  if (is.na(tierfile)) {
+    legal.tier.names <- aclew.tier.names
+  } else {
+    legal.tier.names <- read_csv(tierfile)
+    
+    legal.tier.names <- legal.tier.names %>%
+      mutate(tier_name = paste0(tier_name, collapse = "|")) %>%
+      distinct() %>%
+      pull(tier_name)
+    
+    if (keep_AAS_tier_names) {
+      legal.tier.names <- paste0(aclew.tier.names, "|", legal.tier.names)
+    }
+  }
+}
+
 check.annotations <- function(annfile, nameannfile) {
   #txt.input.path <- "input_files/"
   
@@ -104,9 +122,7 @@ check.annotations <- function(annfile, nameannfile) {
       return("ERROR: contact app developer")
     }
   }
-  
-  legal.tier.names <- "(^xds@[FMU][ACU](\\d{1}|E)$)|(^xds@EE1$)|(^(vcm|lex|mwu)@CHI$)|(^[FMU][ACU](\\d{1}|E)$)|(^EE1$)|(^CHI$)|(^context$)|(^code_num$)|(^code$)|(^notes$)|(^on_off)"
-  
+
   ##########
   
   # debugging
@@ -497,3 +513,4 @@ check.annotations <- function(annfile, nameannfile) {
       
   
 }
+
