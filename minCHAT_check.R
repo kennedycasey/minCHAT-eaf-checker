@@ -1,6 +1,7 @@
 library(tidyverse)
 library(lubridate)
 library(stringr)
+library(phonfieldwork)
 
 check.annotations <- function(annfile, nameannfile) {
   #txt.input.path <- "input_files/"
@@ -109,16 +110,22 @@ check.annotations <- function(annfile, nameannfile) {
   ##########
   
   # debugging
-  # annfile <- "input_files/2625.txt"
-  # nameannfile <- "2625.txt"
+  # annfile <- "input_files/WAR_0602_10800000_11100000_random-13.eaf"
+  # nameannfile <- "WAR_0602_10800000_11100000_random-13.txt"
   
 #  for (annfile in filebatch) {
 #    annots <- read_tsv(paste0(txt.input.path, annfile), col_names = FALSE) %>%
-  annots <- read_tsv(annfile, col_names = FALSE,
-                     locale = locale(encoding = "UTF-8")) %>%
-    rename("tier" = X1, "speaker" = X2, "onset" = X3,
-           "offset" = X4, "duration" = X5, "value" = X6)
-  filename <- unlist((strsplit(nameannfile, "\\.txt")))[1]
+  annots <- eaf_to_df(annfile) %>%
+    transmute(tier = tier_name, 
+              speaker = ifelse(
+                str_detect(tier, "xds|vcm|lex|mwu"), 
+                substr(tier, nchar(tier) - 2, nchar(tier)), 
+                ifelse(nchar(tier) == 3, tier, "")), 
+              onset = time_start*1000, 
+              offset = time_end*1000, 
+              duration = offset - onset, 
+              value = content)
+  filename <- unlist((strsplit(nameannfile, "\\.eaf")))[1]
 #  filename <- as.character(annfile)
   
     
@@ -250,12 +257,14 @@ check.annotations <- function(annfile, nameannfile) {
         TRUE ~ "spkr.vocs"
       ))
     if (nrow(nonCHI.vocs) > 0) {
-      nonCHI.vocs <- nonCHI.vocs %>%
-        group_by(speaker) %>%
-        spread(tier, nvocs, drop = FALSE) %>%
-        mutate(match = spkr.vocs == xds.vocs) %>%
-        filter(match == FALSE) %>%
-        pull(speaker)
+      if (nrow(filter(nonCHI.vocs, tier == "xds.vocs")) > 0) {
+        nonCHI.vocs <- nonCHI.vocs %>%
+          group_by(speaker) %>%
+          spread(tier, nvocs, drop = FALSE) %>%
+          mutate(match = spkr.vocs == xds.vocs) %>%
+          filter(match == FALSE) %>%
+          pull(speaker)
+      }
     } else {
       nonCHI.vocs <- c()
     }
