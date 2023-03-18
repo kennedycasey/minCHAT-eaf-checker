@@ -22,7 +22,7 @@ assign.legal.tier.names <- function(tierfile = NA, keep_AAS_tier_names = FALSE) 
   legal.tier.names <<- legal.tier.names
 }
 
-check.annotations <- function(annfile, nameannfile) {
+check.annotations <- function(annfile, nameannfile, rmtiers) {
   alert.table <- tibble(
     filename = character(),
     alert = character(),
@@ -132,8 +132,6 @@ check.annotations <- function(annfile, nameannfile) {
               value = content)
   filename <- unlist((strsplit(nameannfile, "\\.eaf")))[1]
   
-    
-    
     ##---- CHECKS ----##
   
     #-- correct tier names --#
@@ -238,10 +236,12 @@ check.annotations <- function(annfile, nameannfile) {
             }
           }
         } else {
-          alert.table <- add_alert(
-            filename,
-            "missing LEX or VCM tier",
-            min(annots$onset), max(annots$offset), "", "")
+          if (!("vcm" %in% rmtiers & "lex" %in% rmtiers)) {
+            alert.table <- add_alert(
+              filename,
+              "missing LEX or VCM tier",
+              min(annots$onset), max(annots$offset), "", "")
+          }
         }
       }
     }
@@ -269,7 +269,7 @@ check.annotations <- function(annfile, nameannfile) {
     } else {
       nonCHI.vocs <- c()
     }
-    if (length(nonCHI.vocs) > 0) {
+    if (length(nonCHI.vocs) > 0 & !("xds" %in% rmtiers)) {
       nonCHI.vocs.str <- paste0(nonCHI.vocs, collapse = ", ")
       alert.xds <- paste0(
         "missing XDS annotations; compare the # of utterances with the # of XDS annotations for ",
@@ -281,6 +281,8 @@ check.annotations <- function(annfile, nameannfile) {
     }
   
     #-- invalid annotation values: closed vocabulary --#
+    
+    if (!("xds" %in% rmtiers)) {
       xds.vals <- filter(annots, grepl("xds@", tier)) %>%
         select(value, onset, offset, tier) %>%
         mutate(filename = filename,
@@ -298,7 +300,9 @@ check.annotations <- function(annfile, nameannfile) {
                  )) %>%
         filter(legal != "okay") %>%
         select(filename, alert, onset, offset, tier, value)
+    }
       
+    if (!("vcm" %in% rmtiers)) {
       vcm.vals <- filter(annots, grepl("vcm@", tier)) %>%
         select(value, onset, offset, tier) %>%
         mutate(filename = filename,
@@ -314,7 +318,9 @@ check.annotations <- function(annfile, nameannfile) {
                  )) %>%
         filter(legal != "okay") %>%
         select(filename, alert, onset, offset, tier, value)
+    }
       
+    if (!("lex" %in% rmtiers)) {
       lex.vals <- filter(annots, grepl("lex@", tier)) %>%
         select(value, onset, offset, tier) %>%
         mutate(filename = filename,
@@ -327,7 +333,9 @@ check.annotations <- function(annfile, nameannfile) {
                  )) %>%
         filter(legal != "okay") %>%
         select(filename, alert, onset, offset, tier, value)
-      
+    }
+    
+    if (!("mwu" %in% rmtiers)) {
       mwu.vals <- filter(annots, grepl("mwu@", tier)) %>%
         select(value, onset, offset, tier) %>%
         mutate(filename = filename,
@@ -340,12 +348,32 @@ check.annotations <- function(annfile, nameannfile) {
                  )) %>%
         filter(legal != "okay") %>%
         select(filename, alert, onset, offset, tier, value)
+    }
       
     # add closed vocabulary alerts to table
-    alert.table <- bind_rows(alert.table,
-                             xds.vals, vcm.vals, lex.vals, mwu.vals)
   
-    
+    if (length(rmtiers) > 0) {
+      
+      if (!("xds") %in% rmtiers) {
+        alert.table <- bind_rows(alert.table, 
+                                 xds.vals)
+      }
+      
+      if (!("vcm") %in% rmtiers) {
+        alert.table <- bind_rows(alert.table, 
+                                 vcm.vals)
+      }
+      
+      if (!("lex") %in% rmtiers) {
+        alert.table <- bind_rows(alert.table, 
+                                 lex.vals)
+      }
+      
+      if (!("mwu") %in% rmtiers) {
+        alert.table <- bind_rows(alert.table, 
+                                 mwu.vals)
+      }
+    }
     
     #-- invalid annotation values: transcription --#
     # note that the regular expressions below are *far* from airtight
@@ -487,4 +515,3 @@ check.annotations <- function(annfile, nameannfile) {
         ))
     }
 }
-

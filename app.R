@@ -68,7 +68,7 @@ server <- function(input, output) {
     } else {
       assign.legal.tier.names()
     }
-    check.annotations(input$file1$datapath, input$file1$name)
+    check.annotations(input$file1$datapath, input$file1$name, input$missing_AAS_dependent_tiers)
   })
   
   output$report <- renderUI({
