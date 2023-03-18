@@ -12,27 +12,34 @@ ui <- fluidPage(
     
     # Sidebar panel for inputs ----
     sidebarPanel(
+      h4("File upload"),
       # Input: Annotation file ----
-      fileInput("file1", "Choose your annotation file",
-                accept = c("text/tab-separated-values",
-                           ".txt")),
+      fileInput("file1", "Choose your eaf file",
+                accept = ".eaf", 
+                placeholder = "No file selected"),
       
       # Input: Follow standard AAS?
       radioButtons(inputId = "standard_AAS",
                    choices = list("yes" = 1, "no" = 0),
-                   label = "Are you following the ACLEW annotation scheme exactly?"),
+                   label = "Are you following the ACLEW Annotation Scheme (AAS) exactly?"),
 
       conditionalPanel(
         condition = "input.standard_AAS == 0",
-        # Input: Legal tier names list ----
-        fileInput("tier_names", "Optional: Add your own list of valid tier names",
-                  accept = c(".csv")),
-
+        br(),
+        br(),
+        h4("Non-AAS customizations"),
+        
+        # Optional input: Add tier names list ----
+        fileInput("tier_names", "Add new valid tier names?",
+                  accept = ".csv", 
+                  placeholder =  "No file selected"),
+        
         # Optional input: Keep existing AAS tier names? ----
-        checkboxInput("keep_AAS_tier_names", "Keep standard ACLEW tier names?"),
-
-        checkboxGroupInput("present_AAS_dependent_tiers",
-                           "If not using standard ACLEW instuctions, select which dependent tiers are present:",
+        checkboxInput("keep_AAS_tier_names", "Keep any standard AAS tier names?"),
+        
+        # Optional input: Remove AAS dependent tiers? ----
+        checkboxGroupInput("missing_AAS_dependent_tiers",
+                           "Remove expectation for AAS dependent tiers?",
                            choices = c("xds", "vcm", "lex", "mwu"))
       ),
       
@@ -51,6 +58,7 @@ ui <- fluidPage(
 
 # Define server logic to read selected file ----
 server <- function(input, output) {
+  
   report <- eventReactive(input$submit, {
     req(input$file1)
     req(input$standard_AAS)
