@@ -3,7 +3,7 @@ library(lubridate)
 library(stringr)
 library(phonfieldwork)
 
-assign.legal.tier.names <- function(tierfile = NA, nametierfile = NA, keep_AAS_tier_names = FALSE) {
+assign.legal.tier.names <- function(tierfile = NA, keep_AAS_tier_names = FALSE) {
   aclew.tier.names <- "(^xds@[FMU][ACU](\\d{1}|E)$)|(^xds@EE1$)|(^(vcm|lex|mwu)@CHI$)|(^[FMU][ACU](\\d{1}|E)$)|(^EE1$)|(^CHI$)|(^context$)|(^code_num$)|(^code$)|(^notes$)|(^on_off)"
   if (is.na(tierfile)) {
     legal.tier.names <- aclew.tier.names
@@ -15,7 +15,7 @@ assign.legal.tier.names <- function(tierfile = NA, nametierfile = NA, keep_AAS_t
       distinct() %>%
       pull(tier_name)
     
-    if (keep_AAS_tier_names) {
+    if (keep_AAS_tier_names == TRUE) {
       legal.tier.names <- paste0(aclew.tier.names, "|", legal.tier.names)
     }
   }
@@ -23,10 +23,6 @@ assign.legal.tier.names <- function(tierfile = NA, nametierfile = NA, keep_AAS_t
 }
 
 check.annotations <- function(annfile, nameannfile) {
-  #txt.input.path <- "input_files/"
-  
-  #filebatch <- dir(txt.input.path, pattern="*.txt")
-
   alert.table <- tibble(
     filename = character(),
     alert = character(),
@@ -124,14 +120,6 @@ check.annotations <- function(annfile, nameannfile) {
     }
   }
 
-  ##########
-  
-  # debugging
-  # annfile <- "input_files/WAR_0602_10800000_11100000_random-13.eaf"
-  # nameannfile <- "WAR_0602_10800000_11100000_random-13.txt"
-  
-#  for (annfile in filebatch) {
-#    annots <- read_tsv(paste0(txt.input.path, annfile), col_names = FALSE) %>%
   annots <- eaf_to_df(annfile) %>%
     transmute(tier = tier_name, 
               speaker = ifelse(
@@ -143,16 +131,12 @@ check.annotations <- function(annfile, nameannfile) {
               duration = offset - onset, 
               value = content)
   filename <- unlist((strsplit(nameannfile, "\\.eaf")))[1]
-#  filename <- as.character(annfile)
   
     
     
     ##---- CHECKS ----##
   
-    
     #-- correct tier names --#
-    # check if the tier name is either 3 or 7 characters
-  
     bad.format.tier.names <- unique(annots$tier[which(
       !grepl(legal.tier.names, annots$tier))])
     if (length(bad.format.tier.names) > 0) {
@@ -175,7 +159,6 @@ check.annotations <- function(annfile, nameannfile) {
                      collapse = " ")),
         min(annots$onset), max(annots$offset), "", "")
     }
-    
     
     #-- missing contingent annotations --#
     n.CHI <- filter(annots, tier == "CHI") %>% nrow()
@@ -298,8 +281,6 @@ check.annotations <- function(annfile, nameannfile) {
     }
   
     #-- invalid annotation values: closed vocabulary --#
-    # check XDS values
-#    if (filter(annots, grepl("xds@", tier)) %>% nrow() > 0) {
       xds.vals <- filter(annots, grepl("xds@", tier)) %>%
         select(value, onset, offset, tier) %>%
         mutate(filename = filename,
@@ -317,9 +298,7 @@ check.annotations <- function(annfile, nameannfile) {
                  )) %>%
         filter(legal != "okay") %>%
         select(filename, alert, onset, offset, tier, value)
-#    }
-    # check VCM values
-#    if (filter(annots, grepl("vcm@", tier)) %>% nrow() > 0) {
+      
       vcm.vals <- filter(annots, grepl("vcm@", tier)) %>%
         select(value, onset, offset, tier) %>%
         mutate(filename = filename,
@@ -335,9 +314,7 @@ check.annotations <- function(annfile, nameannfile) {
                  )) %>%
         filter(legal != "okay") %>%
         select(filename, alert, onset, offset, tier, value)
-#    }
-    # check LEX values
-#    if (filter(annots, grepl("lex@", tier)) %>% nrow() > 0) {
+      
       lex.vals <- filter(annots, grepl("lex@", tier)) %>%
         select(value, onset, offset, tier) %>%
         mutate(filename = filename,
@@ -350,9 +327,7 @@ check.annotations <- function(annfile, nameannfile) {
                  )) %>%
         filter(legal != "okay") %>%
         select(filename, alert, onset, offset, tier, value)
-#    }
-    # check MWU values
-#    if (filter(annots, grepl("mwu@", tier)) %>% nrow() > 0) {
+      
       mwu.vals <- filter(annots, grepl("mwu@", tier)) %>%
         select(value, onset, offset, tier) %>%
         mutate(filename = filename,
@@ -365,7 +340,7 @@ check.annotations <- function(annfile, nameannfile) {
                  )) %>%
         filter(legal != "okay") %>%
         select(filename, alert, onset, offset, tier, value)
-#    }
+      
     # add closed vocabulary alerts to table
     alert.table <- bind_rows(alert.table,
                              xds.vals, vcm.vals, lex.vals, mwu.vals)
@@ -511,8 +486,5 @@ check.annotations <- function(annfile, nameannfile) {
           n.hyphens = nrow(hyphenwords.used)
         ))
     }
-#  }
-      
-  
 }
 

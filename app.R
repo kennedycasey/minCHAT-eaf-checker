@@ -62,12 +62,12 @@ server <- function(input, output) {
   report <- eventReactive(input$submit, {
     req(input$file1)
     req(input$standard_AAS)
-    if (exists(input$tier_names$name)) {
-      assign.legal.tier.names(input$tier_names$datapath, input$tier_names$name, input$keep_AAS_tier_names)
+    if (!is.null(input$tier_names$datapath)) {
+      assign.legal.tier.names(tierfile = input$tier_names$datapath,
+                              keep_AAS_tier_names = input$keep_AAS_tier_names)
     } else {
       assign.legal.tier.names()
     }
-    assign.legal.tier.names()
     check.annotations(input$file1$datapath, input$file1$name)
   })
   
