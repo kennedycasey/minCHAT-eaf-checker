@@ -35,11 +35,12 @@ ui <- fluidPage(
                   placeholder =  "No file selected"),
         
         # Optional input: Keep existing AAS tier names? ----
-        checkboxInput("keep_AAS_tier_names", "Keep any standard AAS tier names?"),
+        h5(tags$b("Keep any existing AAS tier names?")),
+        checkboxInput("keep_AAS_tier_names", ""),
         
         # Optional input: Remove AAS dependent tiers? ----
         checkboxGroupInput("missing_AAS_dependent_tiers",
-                           "Remove expectation for AAS dependent tiers?",
+                           "Remove expected AAS dependent tiers?",
                            choices = c("xds", "vcm", "lex", "mwu"))
       ),
       
