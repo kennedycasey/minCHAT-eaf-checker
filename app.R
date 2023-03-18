@@ -3,27 +3,39 @@ source("minCHAT_check.R")
 
 # Define UI for data upload app ----
 ui <- fluidPage(
-
+  
   # App title ----
   titlePanel("ACLEW Annotation Scheme: minCHAT error spotter"),
-
+  
   # Sidebar layout with input and output definitions ----
   sidebarLayout(
-
+    
     # Sidebar panel for inputs ----
     sidebarPanel(
       # Input: Annotation file ----
       fileInput("file1", "Choose your annotation file",
                 accept = c("text/tab-separated-values",
-                         ".txt")),
+                           ".txt")),
       
-      # Input: Legal tier names list ----
-      fileInput("tier_names", "Optional: Add your own list of valid tier names", 
-                accept = c(".csv")),
-      
-      # Optional input: Keep exisint AAS tier names? ----
-      checkboxInput("keep_AAS_tier_names", "Keep standard ACLEW tier names?"),
+      # Input: Follow standard AAS?
+      radioButtons(inputId = "standard_AAS",
+                   choices = list("yes" = 1, "no" = 0),
+                   label = "Are you following the ACLEW annotation scheme exactly?"),
 
+      conditionalPanel(
+        condition = "input.standard_AAS == 0",
+        # Input: Legal tier names list ----
+        fileInput("tier_names", "Optional: Add your own list of valid tier names",
+                  accept = c(".csv")),
+
+        # Optional input: Keep existing AAS tier names? ----
+        checkboxInput("keep_AAS_tier_names", "Keep standard ACLEW tier names?"),
+
+        checkboxGroupInput("present_AAS_dependent_tiers",
+                           "If not using standard ACLEW instuctions, select which dependent tiers are present:",
+                           choices = c("xds", "vcm", "lex", "mwu"))
+      ),
+      
       # Submit button:
       actionButton("submit", "Submit")
     ),
@@ -41,25 +53,31 @@ ui <- fluidPage(
 server <- function(input, output) {
   report <- eventReactive(input$submit, {
     req(input$file1)
-    assign.legal.tier.names(input$tier_names$datapath, input$tier_names$name, input$keep_AAS_tier_names)
+    req(input$standard_AAS)
+    if (exists(input$tier_names$name)) {
+      assign.legal.tier.names(input$tier_names$datapath, input$tier_names$name, input$keep_AAS_tier_names)
+    } else {
+      assign.legal.tier.names()
+    }
+    assign.legal.tier.names()
     check.annotations(input$file1$datapath, input$file1$name)
   })
-
+  
   output$report <- renderUI({
     req(report())
     
     tagList(
       tags$br(),
       renderText(paste0("Number of potential errors detected: ",
-        as.character(report()$n.a.alerts))),
+                        as.character(report()$n.a.alerts))),
       renderText("(downloadable list below)"),
       tags$br(),
       renderText(paste0("Number of capitalized word types detected: ",
-        as.character(report()$n.capitals))),
+                        as.character(report()$n.capitals))),
       renderTable(report()$capitals),
       tags$br(),
       renderText(paste0("Number of hyphenated word types detected: ",
-        as.character(report()$n.hyphens))),
+                        as.character(report()$n.hyphens))),
       renderTable(report()$hyphens),
       tags$br()
     )
@@ -71,7 +89,7 @@ server <- function(input, output) {
     time.now <- gsub(' ', '_', time.now)
     
     errors <- report()$alert.table
-  
+    
     output$downloadErrorsHandler <- downloadHandler(
       filename = paste0("minCHATerrorcheck-",time.now,"-possible_errors.csv"),
       content = function(file) {

@@ -3,7 +3,7 @@ library(lubridate)
 library(stringr)
 library(phonfieldwork)
 
-assign.legal.tier.names <- function(tierfile, nametierfile, keep_AAS_tier_names) {
+assign.legal.tier.names <- function(tierfile = NA, nametierfile = NA, keep_AAS_tier_names = FALSE) {
   aclew.tier.names <- "(^xds@[FMU][ACU](\\d{1}|E)$)|(^xds@EE1$)|(^(vcm|lex|mwu)@CHI$)|(^[FMU][ACU](\\d{1}|E)$)|(^EE1$)|(^CHI$)|(^context$)|(^code_num$)|(^code$)|(^notes$)|(^on_off)"
   if (is.na(tierfile)) {
     legal.tier.names <- aclew.tier.names
@@ -19,6 +19,7 @@ assign.legal.tier.names <- function(tierfile, nametierfile, keep_AAS_tier_names)
       legal.tier.names <- paste0(aclew.tier.names, "|", legal.tier.names)
     }
   }
+  legal.tier.names <<- legal.tier.names
 }
 
 check.annotations <- function(annfile, nameannfile) {
@@ -158,10 +159,11 @@ check.annotations <- function(annfile, nameannfile) {
       alert.table <- add_alert(filename,
         paste0("wrong format tier name(s): ",
                paste(
-                 bad.format.tier.names, collapse = " ")),
+                 bad.format.tier.names, collapse = ", ")),
         min(annots$onset), max(annots$offset), "", "")
     }
     # if the pre- or post-fixes don't match one of the limited types
+    
     tier.names <- unique(unlist(strsplit(annots$tier[which(grepl("@", annots$tier))], "@")))
     name.part.matches <- tier.names %in% c("vcm", "lex", "mwu", "xds") |
          grepl("([FMU][ACU](\\d{1}|E))|(EE1)", tier.names) |
