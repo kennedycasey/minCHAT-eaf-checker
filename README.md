@@ -1,70 +1,32 @@
-# AAS-minCHAT-Checker
-Allows annotators to automatically check for basic minCHAT errors in their transcriptions so that they can manually fix those errors and submit them.
+# minCHAT-eaf-checker
 
-**This script won't catch all the errors!!**
+This is an adaptation of the ACLEW Annotation Scheme minCHAT checker app found [here](https://github.com/aclew/AAS-minCHAT-Checker). The app allows annotators to automatically check for _potential_ minCHAT errors in their transcriptions so that they can manually fix those errors if needed.
 
-* It only catches errors as described below
-* It might even catch some "errors" that are _in reality_ perfectly fine
+The app, as written, is best suited for users who followed an adapted version of the [ACLEW Annotation Scheme (AAS)](https://osf.io/b2jep/wiki/home/) or for users who want to simply check minCHAT errors in transcription tiers without also checking for issues with non-AAS dependent tiers or validating non-AAS closed-vocabulary annotation values).
 
-It is up to you humans to fix those as needed! This is just a tool to help annotators do check the basic ACLEW Annotation Scheme and minCHAT standards used in their annotation files.
+The main changes from the original version are as follows:
 
-Note that to properly check each file you'll have to both (a) open the file in ELAN and (b) export a text version of it for use with the minCHAT checker tool.
-
-## Instructions
-
-###  Start with a quick ELAN manual check
-1. Locate the .eaf file you want to check; to ensure that you are using the most recent version of your files, clone (recommended) or download the directory of .eafs you want to analyze from our shared ACLEW github repo (e.g. rely\_XXX or raw\_XXX).
-
-2. Open the file in ELAN
-
-3. Check carefully for the following possible issues in your .eaf file:
-    - **Tiers that shouldn't belong:** The file might have extra tiers or tiers with illegal names (a common extra tier is `default`). The only tiers allowed should be speaker and dependent tiers (e.g., `FA1`, `xds@FA1`, `CHI`, `vcm@CHI`, `UC2`, `xds@MA3`, etc.), and the non-speaker tiers used across ACLEW corpora: `context`, `code_num`, `code`, `on_off`, and `notes`. Any tier that has has a name different from these _exact_ options should be deleted or fixed to fit these name options.
-    - **Missing/inaccurate participant names:** Go to `Tier > Change Tier Attributes...` to view a table of your tiers. Check that each tier associated with a speaker (e.g., `FA1` and `xds@FA1`) is associated with the correct participant name (e.g., `FA1`). If not, fix it. See Figure 1 for details.
-
-_Figure 1._ How to check participant assignment and fix any errors.
-
-<p align="center"> 
-<img src="ChangePtcpInfo-screenshot.png" alt="ChangePtcpInfo-screenshot" width="800"/>
-</p>
-
-###  Export to tab-delimited text
-
-4. Now that you have checked for these basic errors in ELAN, you should export the .eaf file as a tab-delimited text file (`File > Export As > Tab-delimited text`. When you do this, make sure that *all tiers* are selected and the right *time format* (ms) is included); see Figure 2 below.
-    * ELAN will likely ask you to find the media (e.g., .wav) file. Select `Cancel` and proceed unless you want to listen to the media while checking for formatting errors. You can also add the media file back later by going to  `Edit > Linked Files...` and adding it there.
-    * When you click to export the .txt file it will ask you about encoding: the default setting of `UTF-8` is the correct one for our tool.
-
-_Figure 2._ Select all tiers and make sure your time column settings are set up as shown below. When prompted about format type for export, select UTF-8.
-
-<p align="center"> 
-<img src="EAF2TXT-screenshot.png" alt="EAF2TXT-screenshot" width="300"/>
-</p>
-
-### Run automated error detection
-
-5. Go to [https://aclew.shinyapps.io/AAS-minCHAT-Checker/](https://aclew.shinyapps.io/AAS-minCHAT-Checker/)
-
-6. Upload the file and click `Submit`.
-
-7. The tool gives the number of possible errors it detected and a list of the capitalized and hyphenated words in the transcription (make sure these match the minCHAT rules!). You can download a more detailed spreadsheet of possible errors at the bottom of the report; remember, this tool finds potential errors—it is your job to determine whether there are real errors!
-
-8. Problems? See Error Reporting below.
+* minCHAT eaf checker takes raw ELAN files (eaf files) as input rather than txt files, so annotators do not need to complete manual eaf to txt export
+* minCHAT eaf checker supports variation in the tier types and names allowed (see [non-AAS customizations](#-non-aas-customizations) below)
 
 
-## What does the minCHAT checker look for?
+### What does minCHAT eaf checker look for?
 
-It checks to see whether...
+For all tiers (some overlap with [original version](https://github.com/aclew/AAS-minCHAT-Checker)), it checks to see whether:
 
-* the tier name is either 3 or 7 characters
-* the tier name pre- and post-fixes match one of the limited types (e.g., "vcm", "CHI", "FA1")
-* there are missing annotations (e.g., a missing LEX annotation when VCM = C)
-* there are too many or two few annotations
-* the closed-vocabulary annotation values (e.g., XDS, VCM) are valid
+* tier names match the user-supplied list and/or the standard AAS tier names
 * there are empty transcriptions
 * transcriptions have too few or too many terminal markers
 * the use of square brackets follows one of the following patterns: **\<blabla\> [: blabla]**, **\<blabla\> [=! blabla]**, or **[- lng]**
 * the use of @ follows one of the following patterns: **blabla@s:eng**, **blabla@l**, or **blabla@c**
 
-## What doesn't the checker look for?
+For AAS tiers (same as [original version](https://github.com/aclew/AAS-minCHAT-Checker)), it checks to see whether:
+
+* tier names are either 3 or 7 characters
+* there are too many or too few annotations (for dependent AAS tiers: "xds", "vcm", "lex", and/or "mwu")
+* the AAS closed-vocabulary annotation values (e.g., XDS, VCM) are valid
+
+### What doesn't the checker look for?
 
 Here's a non-exhaustive list: 
   
@@ -77,8 +39,29 @@ Here's a non-exhaustive list:
 * the proper use of hyphens and ampersands to indicate cut-off/restarted speech (e.g., he- or he&, -in or &in)
 * matching speaker names across related tiers
 * inner tier structure (i.e., correct hierarchical set-up; requires XML)
-* the use of things like [+ CHI], that were in some of the ROS files **NOTE THAT THESE WILL SHOW UP AS ERRORS; ROS can choose to ignore them for now**
-  
-## Error reporting
 
-Please report any problems you encounter. You can file them under the issues tab of this tool's github repository ([https://github.com/aclew/AAS-minCHAT-Checker/issues]()). When filing an issue, please provide a link to the _exact_ input files you were using as well as a detailed explanation of the problem you encountered. Otherwise we might not be able to re-create the problem and fix it!
+
+## Instructions
+
+* Go to [link to be added]()
+* Upload your eaf file
+* Select whether you followed _exactly_ the [ACLEW Annotation Scheme (AAS)](https://osf.io/b2jep/wiki/home/)
+* If not, see the options below for [non-AAS customizations](#-non-aas-customizations) before clicking `Submit` 
+
+#### Non-AAS customizations
+`Add new legal tier names?`
+You can optionally add new legal tier names by uploading a **csv** file with a single column that contains one tier name per cell.
+
+`Keep any existing AAS tier names?`
+If you want these tier names to be counted as legal _in addition_ to standard AAS tier names, then be sure to check this box.
+
+`Remove expected AAS dependent tiers?` 
+If your your file does not contain some or all of the AAS dependent tier types ("xds", "vcm", "lex", "mwu"), then check the boxes for the tiers that are not present.
+
+#### Understanding the error report
+As with the [original version](https://github.com/aclew/AAS-minCHAT-Checker), this tool gives the number of possible errors it detected and a list of the capitalized and hyphenated words in the transcription (make sure these match the minCHAT rules!). You can download a more detailed spreadsheet of possible errors at the bottom of the report; remember, this tool finds _potential_ errors&mdash;it is your job to determine whether these are real errors!
+
+**This script won't catch all the errors!**
+
+* It only catches errors as described [here](#-what-does-minCHAT-eaf-checker-look-for?)
+* It might even catch some "errors" that are _in reality_ perfectly fine
