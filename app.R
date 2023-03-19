@@ -30,7 +30,7 @@ ui <- fluidPage(
         h4("Non-AAS customizations"),
         
         # Optional input: Add tier names list ----
-        fileInput("tier_names", "Add new valid tier names?",
+        fileInput("tier_names", "Add new legal tier names?",
                   accept = ".csv", 
                   placeholder =  "No file selected"),
         
