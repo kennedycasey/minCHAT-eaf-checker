@@ -7,7 +7,7 @@ The app, as written, is best suited for users who followed an adapted version of
 The main changes from the original version are as follows:
 
 * minCHAT eaf checker takes raw ELAN files (eaf files) as input rather than txt files, so annotators do not need to complete manual eaf to txt export
-* minCHAT eaf checker supports variation in the tier types and names allowed (see [non-AAS customizations](#-non-aas-customizations) below)
+* minCHAT eaf checker supports variation in the tier types and names allowed (see [non-AAS customizations](#non-aas-customizations) below)
 
 
 ### What does minCHAT eaf checker look for?
@@ -47,7 +47,7 @@ Here's a non-exhaustive list:
 * Go to [link to be added]()
 * Upload your eaf file
 * Select whether you followed _exactly_ the [ACLEW Annotation Scheme (AAS)](https://osf.io/b2jep/wiki/home/)
-* If not, see the options below for [non-AAS customizations](#-non-aas-customizations) before clicking `Submit` 
+* If not, see the options below for [non-AAS customizations](#non-aas-customizations) before clicking `Submit` 
 
 #### Non-AAS customizations
 `Add new legal tier names?`
@@ -64,5 +64,5 @@ As with the [original version](https://github.com/aclew/AAS-minCHAT-Checker), th
 
 **This script won't catch all the errors!**
 
-* It only catches errors as described [here](#-what-does-minCHAT-eaf-checker-look-for?)
+* It only catches errors as described [here](#what-does-minchat-eaf-checker-look-for)
 * It might even catch some "errors" that are _in reality_ perfectly fine
