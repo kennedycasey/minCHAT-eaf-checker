@@ -16,7 +16,8 @@ For all tiers (some overlap with [original version](https://github.com/aclew/AAS
 
 * tier names match the user-supplied list and/or the standard AAS tier names
 * there are empty transcriptions
-* transcriptions have too few or too many terminal markers
+* there are transcriptions with too few or too many terminal markers
+* there are transcriptions with extra spaces, including: 2+ spaces in a row, a space in the utterance-initial postion, a space before a terminal marker, and/or a space after a terminal marker
 * the use of square brackets follows one of the following patterns: **\<blabla\> [: blabla]**, **\<blabla\> [=! blabla]**, or **[- lng]**
 * the use of @ follows one of the following patterns: **blabla@s:eng**, **blabla@l**, or **blabla@c**
 

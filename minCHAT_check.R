@@ -466,7 +466,13 @@ check.annotations <- function(annfile, nameannfile, rmtiers) {
     ) %>%
     filter(n_terms > 1) %>%
     select(filename, alert, onset, offset, tier, value)
-  
+  # check for utterances with extra spaces
+  extspace.utts <- filter(utts,
+                       (grepl("\\s{2,}|^\\s|\\s[[:punct:]]$|[[:punct:]]\\s$", value))) %>%
+    select(onset, offset, tier, value) %>%
+    mutate(filename = filename,
+           alert = "extra space(s)") %>%
+    select(filename, alert, onset, offset, tier, value)
   # check for uses of square bracket expressions
   squarebrace.errs <- filter(utts, grepl("[[]", value)) %>%
     select(onset, offset, tier, value)
@@ -519,6 +525,7 @@ check.annotations <- function(annfile, nameannfile, rmtiers) {
   # add open transcription alerts to table
   alert.table <- bind_rows(alert.table,
                            empty.utts,
+                           extspace.utts,
                            nonterminating.utts,
                            overterminating.utts,
                            spchchr.errs)
