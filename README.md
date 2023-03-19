@@ -43,7 +43,7 @@ Here's a non-exhaustive list:
 
 ## Instructions
 
-* Go to [link to be added]()
+* Go to [https://aclew.shinyapps.io/minCHAT-eaf-checker/](https://aclew.shinyapps.io/minCHAT-eaf-checker/)
 * Upload your eaf file
 * Select whether you followed _exactly_ the [ACLEW Annotation Scheme (AAS)](https://osf.io/b2jep/wiki/home/)
 * If not, see the options below for [non-AAS customizations](#non-aas-customizations) before clicking `Submit`
