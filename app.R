@@ -5,7 +5,7 @@ source("minCHAT_check.R")
 ui <- fluidPage(
   
   # App title ----
-  titlePanel("ACLEW Annotation Scheme: minCHAT error spotter"),
+  titlePanel("minCHAT eaf checker"),
   
   # Sidebar layout with input and output definitions ----
   sidebarLayout(
