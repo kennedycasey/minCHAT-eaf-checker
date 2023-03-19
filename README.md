@@ -36,7 +36,6 @@ Here's a non-exhaustive list:
 * \[=! verbs] (checks the bracket syntax, but not the use of present 3ps tense)
 * xxx vs. yyy
 * the proper use of capital letters of hyphenated words; but it does return a list of these for manual review
-* extra spaces
 * the proper use of hyphens and ampersands to indicate cut-off/restarted speech (e.g., he- or he&, -in or &in)
 * matching speaker names across related tiers
 * inner tier structure (i.e., correct hierarchical set-up; requires XML)
