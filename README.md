@@ -47,9 +47,10 @@ Here's a non-exhaustive list:
 * Go to [link to be added]()
 * Upload your eaf file
 * Select whether you followed _exactly_ the [ACLEW Annotation Scheme (AAS)](https://osf.io/b2jep/wiki/home/)
-* If not, see the options below for [non-AAS customizations](#non-aas-customizations) before clicking `Submit` 
+* If not, see the options below for [non-AAS customizations](#non-aas-customizations) before clicking `Submit`
+* Then, view and download your [error report](#error-report)
 
-#### Non-AAS customizations
+### Non-AAS customizations
 `Add new legal tier names?`
 You can optionally add new legal tier names by uploading a **csv** file with a single column that contains one tier name per cell.
 
@@ -59,7 +60,7 @@ If you want these tier names to be counted as legal _in addition_ to standard AA
 `Remove expected AAS dependent tiers?` 
 If your your file does not contain some or all of the AAS dependent tier types ("xds", "vcm", "lex", "mwu"), then check the boxes for the tiers that are not present.
 
-#### Understanding the error report
+### Error report
 As with the [original version](https://github.com/aclew/AAS-minCHAT-Checker), this tool gives the number of possible errors it detected and a list of the capitalized and hyphenated words in the transcription (make sure these match the minCHAT rules!). You can download a more detailed spreadsheet of possible errors at the bottom of the report; remember, this tool finds _potential_ errors&mdash;it is your job to determine whether these are real errors!
 
 **This script won't catch all the errors!**
